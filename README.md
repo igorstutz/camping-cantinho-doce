@@ -6,7 +6,8 @@ Publicado em: https://igorstutz.github.io/camping-cantinho-doce/
 
 ## Estrutura
 
-- `index.html` — página única com todas as seções
+- `index.html` — página inicial com todas as seções
+- `guia.html` — guia do hóspede completo (horários, o que trazer, regras, onde comer, conveniências, política, clube)
 - `css/style.css` — estilos
 - `js/data.js` — dados das acomodações (nomes, valores, comodidades, fotos)
 - `js/main.js` — interações (menu, slideshow, modal, lightbox)

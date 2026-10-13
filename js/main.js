@@ -1,4 +1,4 @@
-/* Cantinho Doce — interações da página */
+/* Cantinho Doce — interações (compartilhado por index.html e guia.html) */
 (function () {
   "use strict";
 
@@ -15,50 +15,41 @@
 
   function onScroll() {
     const y = window.scrollY;
-    header.classList.toggle("is-scrolled", y > 40);
-    toTop.classList.toggle("is-visible", y > 700);
+    if (header) header.classList.toggle("is-scrolled", y > 40);
+    if (toTop) toTop.classList.toggle("is-visible", y > 700);
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  navToggle.addEventListener("click", () => {
-    const open = document.body.classList.toggle("menu-open");
-    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-  $$("#nav a").forEach((a) => a.addEventListener("click", () => {
-    document.body.classList.remove("menu-open");
-    navToggle.setAttribute("aria-expanded", "false");
-  }));
-
-  toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  if (navToggle) {
+    navToggle.addEventListener("click", () => {
+      const open = document.body.classList.toggle("menu-open");
+      navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    $$("#nav a").forEach((a) => a.addEventListener("click", () => {
+      document.body.classList.remove("menu-open");
+      navToggle.setAttribute("aria-expanded", "false");
+    }));
+  }
+  if (toTop) toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
   /* ---------- Hero slideshow ---------- */
   const slides = $$(".hero__slide");
   const dotsWrap = $("#heroDots");
   const caption = $("#heroCaption");
   const INTERVAL = 5500;
-  let current = 0, timer = null;
-
-  slides.forEach((s, i) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.setAttribute("aria-label", "Foto " + (i + 1));
-    b.addEventListener("click", () => { go(i); restart(); });
-    dotsWrap.appendChild(b);
-  });
-  const dots = $$("button", dotsWrap);
+  let current = 0, timer = null, dots = [];
 
   function go(i) {
     slides[current].classList.remove("is-active");
-    dots[current].classList.remove("is-active");
+    if (dots[current]) dots[current].classList.remove("is-active");
     current = (i + slides.length) % slides.length;
     slides[current].classList.add("is-active");
-    dots[current].classList.add("is-active");
+    if (dots[current]) dots[current].classList.add("is-active");
     if (caption) {
       caption.classList.add("is-fading");
       setTimeout(() => { caption.textContent = slides[current].dataset.caption || ""; caption.classList.remove("is-fading"); }, 600);
     }
-    // pré-carrega a próxima
     const next = slides[(current + 1) % slides.length];
     if (next && !next.dataset.loaded) {
       const im = new Image();
@@ -71,11 +62,24 @@
     clearInterval(timer);
     if (slides.length > 1) timer = setInterval(() => go(current + 1), INTERVAL);
   }
-  slides.forEach((s, i) => { if (i === 0) { s.style.backgroundImage = "url('" + s.dataset.src + "')"; s.dataset.loaded = "1"; } });
-  if (caption && slides[0]) caption.textContent = slides[0].dataset.caption || "";
-  go(0);
-  restart();
-  document.addEventListener("visibilitychange", () => { if (document.hidden) clearInterval(timer); else restart(); });
+  if (slides.length) {
+    if (dotsWrap) {
+      slides.forEach((s, i) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("aria-label", "Foto " + (i + 1));
+        b.addEventListener("click", () => { go(i); restart(); });
+        dotsWrap.appendChild(b);
+      });
+      dots = $$("button", dotsWrap);
+    }
+    slides[0].style.backgroundImage = "url('" + slides[0].dataset.src + "')";
+    slides[0].dataset.loaded = "1";
+    if (caption) caption.textContent = slides[0].dataset.caption || "";
+    go(0);
+    restart();
+    document.addEventListener("visibilitychange", () => { if (document.hidden) clearInterval(timer); else restart(); });
+  }
 
   /* ---------- Revelação ao rolar ---------- */
   const io = new IntersectionObserver((entries) => {
@@ -122,6 +126,7 @@
   let lbItems = [], lbIndex = 0, lbReturnFocus = null;
 
   function openLightbox(items, index, returnFocus) {
+    if (!lb) return;
     lbItems = items; lbIndex = index; lbReturnFocus = returnFocus || document.activeElement;
     renderLb();
     lb.classList.add("is-open");
@@ -132,40 +137,38 @@
   function closeLightbox() {
     lb.classList.remove("is-open");
     lb.setAttribute("aria-hidden", "true");
-    if (!$("#roomModal").classList.contains("is-open")) document.body.classList.remove("no-scroll");
+    const rm = $("#roomModal");
+    if (!(rm && rm.classList.contains("is-open"))) document.body.classList.remove("no-scroll");
     if (lbReturnFocus && lbReturnFocus.focus) lbReturnFocus.focus();
   }
   function renderLb() {
     const it = lbItems[lbIndex];
     lbImg.src = it.src; lbImg.alt = it.caption || "";
     lbCap.innerHTML = esc(it.caption || "") + "<span>" + (lbIndex + 1) + " / " + lbItems.length + "</span>";
-    // pré-carrega vizinhas
     [lbIndex + 1, lbIndex - 1].forEach((i) => { const n = lbItems[(i + lbItems.length) % lbItems.length]; if (n) { const im = new Image(); im.src = n.src; } });
   }
   function lbStep(d) { lbIndex = (lbIndex + d + lbItems.length) % lbItems.length; renderLb(); }
-  $(".lightbox__btn--close", lb).addEventListener("click", closeLightbox);
-  $(".lightbox__btn--prev", lb).addEventListener("click", () => lbStep(-1));
-  $(".lightbox__btn--next", lb).addEventListener("click", () => lbStep(1));
-  lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
-
-  // toque: deslizar
-  let tx = 0;
-  lb.addEventListener("touchstart", (e) => { tx = e.changedTouches[0].clientX; }, { passive: true });
-  lb.addEventListener("touchend", (e) => { const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) lbStep(dx < 0 ? 1 : -1); }, { passive: true });
-
-  // links de galeria agrupados por data-lightbox
-  $$("a[data-lightbox]").forEach((a) => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      const group = $$('a[data-lightbox="' + a.dataset.lightbox + '"]');
-      const items = group.map((g) => ({ src: g.getAttribute("href"), caption: g.dataset.caption || ($("img", g) || {}).alt || "" }));
-      openLightbox(items, group.indexOf(a), a);
+  if (lb) {
+    $(".lightbox__btn--close", lb).addEventListener("click", closeLightbox);
+    $(".lightbox__btn--prev", lb).addEventListener("click", () => lbStep(-1));
+    $(".lightbox__btn--next", lb).addEventListener("click", () => lbStep(1));
+    lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
+    let tx = 0;
+    lb.addEventListener("touchstart", (e) => { tx = e.changedTouches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", (e) => { const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) lbStep(dx < 0 ? 1 : -1); }, { passive: true });
+    $$("a[data-lightbox]").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const group = $$('a[data-lightbox="' + a.dataset.lightbox + '"]');
+        const items = group.map((g) => ({ src: g.getAttribute("href"), caption: g.dataset.caption || ($("img", g) || {}).alt || "" }));
+        openLightbox(items, group.indexOf(a), a);
+      });
     });
-  });
+  }
 
   /* ---------- Modal de acomodação ---------- */
   const modal = $("#roomModal");
-  const panel = $(".modal__panel", modal);
+  const panel = modal ? $(".modal__panel", modal) : null;
   let room = null, idx = 0, modalReturnFocus = null;
 
   function priceRows(r) {
@@ -173,7 +176,6 @@
       "<tr" + (p[2] ? ' class="best"' : "") + "><td>" + esc(p[0]) + (p[2] ? '<span class="pill">melhor valor</span>' : "") + "</td><td>" + esc(p[1]) + (p[2] ? "<small style=\"font-family:var(--font-body);font-size:12px;font-weight:600;color:var(--ink-3)\"> / diária</small>" : "") + "</td></tr>"
     ).join("");
   }
-
   function renderModal() {
     const r = room;
     panel.innerHTML =
@@ -211,7 +213,6 @@
     });
     $$("#modalThumbs button", panel).forEach((b) => b.addEventListener("click", () => setIdx(+b.dataset.i)));
   }
-
   function setIdx(i) {
     idx = (i + room.images.length) % room.images.length;
     const im = $("#modalImg", panel);
@@ -222,7 +223,6 @@
       if (j === idx) b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
     });
   }
-
   function openRoom(slug, returnFocus) {
     room = DATA.rooms.find((r) => r.slug === slug);
     if (!room) return;
@@ -241,15 +241,16 @@
     document.body.classList.remove("no-scroll");
     if (modalReturnFocus && modalReturnFocus.focus) modalReturnFocus.focus();
   }
-  $(".modal__backdrop", modal).addEventListener("click", closeModal);
-  $("#modalClose").addEventListener("click", closeModal);
+  if (modal && DATA) {
+    $(".modal__backdrop", modal).addEventListener("click", closeModal);
+    $("#modalClose").addEventListener("click", closeModal);
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-room]");
+      if (t) { e.preventDefault(); openRoom(t.dataset.room, t); }
+    });
+  }
 
-  document.addEventListener("click", (e) => {
-    const t = e.target.closest("[data-room]");
-    if (t) { e.preventDefault(); openRoom(t.dataset.room, t); }
-  });
-
-  /* ---------- Modal de rota (Descubra Lumiar) ---------- */
+  /* ---------- Modal de rota (Google Maps) ---------- */
   const mapModal = $("#mapModal");
   const ORIGIN = "Cantinho Doce Pousada e Camping Clube, Lumiar, Nova Friburgo - RJ";
   const PLACES = {
@@ -259,18 +260,20 @@
     ponte:    { name: "Ponte da Saudade",   dest: "Ponte da Saudade, Nova Friburgo - RJ" },
   };
   let mapReturnFocus = null;
-  function openMap(slug, returnFocus) {
-    const pl = PLACES[slug];
-    if (!pl || !mapModal) return;
+  function openMap(name, dest, returnFocus, origin) {
+    if (!mapModal) return;
     mapReturnFocus = returnFocus;
-    $("#mapTitle").textContent = "Cantinho Doce → " + pl.name;
-    $("#mapSub").textContent = "Rota de carro saindo do Cantinho Doce até " + pl.name;
-    $("#mapFrame").src = "https://www.google.com/maps?saddr=" + encodeURIComponent(ORIGIN) + "&daddr=" + encodeURIComponent(pl.dest) + "&hl=pt-BR&output=embed";
-    $("#mapOpen").href = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(ORIGIN) + "&destination=" + encodeURIComponent(pl.dest) + "&travelmode=driving";
+    const from = origin || ORIGIN;
+    const fromLabel = origin ? name.split(" → ")[0] : "Cantinho Doce";
+    $("#mapTitle").textContent = origin ? name : "Cantinho Doce → " + name;
+    $("#mapSub").textContent = origin ? "Rota de carro até o Cantinho Doce" : "Rota de carro saindo do Cantinho Doce até " + name;
+    $("#mapFrame").src = "https://www.google.com/maps?saddr=" + encodeURIComponent(from) + "&daddr=" + encodeURIComponent(dest) + "&hl=pt-BR&output=embed";
+    $("#mapOpen").href = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(from) + "&destination=" + encodeURIComponent(dest) + "&travelmode=driving";
     mapModal.classList.add("is-open");
     mapModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("no-scroll");
     $("#mapClose").focus();
+    void fromLabel;
   }
   function closeMap() {
     mapModal.classList.remove("is-open");
@@ -284,40 +287,39 @@
     $("#mapClose").addEventListener("click", closeMap);
     $("#mapCloseBtn").addEventListener("click", closeMap);
     document.addEventListener("click", (e) => {
-      const t = e.target.closest("[data-map]");
-      if (t) { e.preventDefault(); openMap(t.dataset.map, t); }
+      const t = e.target.closest("[data-map],[data-dest]");
+      if (!t) return;
+      e.preventDefault();
+      if (t.dataset.map && PLACES[t.dataset.map]) {
+        openMap(PLACES[t.dataset.map].name, PLACES[t.dataset.map].dest, t);
+      } else if (t.dataset.dest) {
+        // data-from: rota ATÉ o Cantinho Doce partindo de outra cidade
+        if (t.dataset.from) openMap((t.dataset.name || t.dataset.from) + " → Cantinho Doce", ORIGIN, t, t.dataset.from);
+        else openMap(t.dataset.name || t.dataset.dest, t.dataset.dest, t);
+      }
     });
   }
 
-  /* ---------- Modal do guia do hóspede ---------- */
-  const guideModal = $("#guideModal");
-  const GUIDE_URL = "https://guia.cantinhodocepousada.com/";
-  let guideReturnFocus = null;
-  function openGuide(anchor, returnFocus) {
-    if (!guideModal) return;
-    guideReturnFocus = returnFocus;
-    const url = GUIDE_URL + (anchor ? "#" + anchor : "");
-    $("#guideFrame").src = url;
-    $("#guideOpen").href = url;
-    guideModal.classList.add("is-open");
-    guideModal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("no-scroll");
-    $("#guideClose").focus();
-  }
-  function closeGuide() {
-    guideModal.classList.remove("is-open");
-    guideModal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("no-scroll");
-    setTimeout(() => { $("#guideFrame").src = "about:blank"; }, 400);
-    if (guideReturnFocus && guideReturnFocus.focus) guideReturnFocus.focus();
-  }
-  if (guideModal) {
-    $(".modal__backdrop", guideModal).addEventListener("click", closeGuide);
-    $("#guideClose").addEventListener("click", closeGuide);
-    document.addEventListener("click", (e) => {
-      const t = e.target.closest("[data-guide]");
-      if (t) { e.preventDefault(); openGuide(t.dataset.guide, t); }
-    });
+  /* ---------- Navegação de capítulos (guia.html) ---------- */
+  const chapNav = $("#chapterNav");
+  if (chapNav) {
+    const links = $$("a[href^='#']", chapNav);
+    const secs = links.map((a) => $(a.getAttribute("href"))).filter(Boolean);
+    const inner = $(".chapnav__inner", chapNav) || chapNav;
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        const id = "#" + en.target.id;
+        links.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === id));
+        const act = links.find((a) => a.getAttribute("href") === id);
+        if (act) inner.scrollTo({ left: act.offsetLeft - 24, behavior: "smooth" });
+      });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+    secs.forEach((s) => spy.observe(s));
+    // acima do primeiro capítulo, nenhum fica marcado
+    window.addEventListener("scroll", () => {
+      if (secs.length && window.scrollY < secs[0].offsetTop - window.innerHeight * 0.4) links.forEach((a) => a.classList.remove("is-active"));
+    }, { passive: true });
   }
 
   /* ---------- Faixa de depoimentos (duplica para loop contínuo) ---------- */
@@ -330,7 +332,7 @@
 
   /* ---------- Teclado ---------- */
   document.addEventListener("keydown", (e) => {
-    if (lb.classList.contains("is-open")) {
+    if (lb && lb.classList.contains("is-open")) {
       if (e.key === "Escape") closeLightbox();
       else if (e.key === "ArrowRight") lbStep(1);
       else if (e.key === "ArrowLeft") lbStep(-1);
@@ -340,11 +342,7 @@
       if (e.key === "Escape") closeMap();
       return;
     }
-    if (guideModal && guideModal.classList.contains("is-open")) {
-      if (e.key === "Escape") closeGuide();
-      return;
-    }
-    if (modal.classList.contains("is-open")) {
+    if (modal && modal.classList.contains("is-open")) {
       if (e.key === "Escape") closeModal();
       else if (e.key === "ArrowRight") setIdx(idx + 1);
       else if (e.key === "ArrowLeft") setIdx(idx - 1);
