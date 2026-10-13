@@ -289,6 +289,37 @@
     });
   }
 
+  /* ---------- Modal do guia do hóspede ---------- */
+  const guideModal = $("#guideModal");
+  const GUIDE_URL = "https://guia.cantinhodocepousada.com/";
+  let guideReturnFocus = null;
+  function openGuide(anchor, returnFocus) {
+    if (!guideModal) return;
+    guideReturnFocus = returnFocus;
+    const url = GUIDE_URL + (anchor ? "#" + anchor : "");
+    $("#guideFrame").src = url;
+    $("#guideOpen").href = url;
+    guideModal.classList.add("is-open");
+    guideModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+    $("#guideClose").focus();
+  }
+  function closeGuide() {
+    guideModal.classList.remove("is-open");
+    guideModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll");
+    setTimeout(() => { $("#guideFrame").src = "about:blank"; }, 400);
+    if (guideReturnFocus && guideReturnFocus.focus) guideReturnFocus.focus();
+  }
+  if (guideModal) {
+    $(".modal__backdrop", guideModal).addEventListener("click", closeGuide);
+    $("#guideClose").addEventListener("click", closeGuide);
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-guide]");
+      if (t) { e.preventDefault(); openGuide(t.dataset.guide, t); }
+    });
+  }
+
   /* ---------- Faixa de depoimentos (duplica para loop contínuo) ---------- */
   ["#rvTrack1", "#rvTrack2"].forEach((id) => {
     const track = $(id);
@@ -307,6 +338,10 @@
     }
     if (mapModal && mapModal.classList.contains("is-open")) {
       if (e.key === "Escape") closeMap();
+      return;
+    }
+    if (guideModal && guideModal.classList.contains("is-open")) {
+      if (e.key === "Escape") closeGuide();
       return;
     }
     if (modal.classList.contains("is-open")) {
