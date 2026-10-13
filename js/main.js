@@ -249,12 +249,64 @@
     if (t) { e.preventDefault(); openRoom(t.dataset.room, t); }
   });
 
+  /* ---------- Modal de rota (Descubra Lumiar) ---------- */
+  const mapModal = $("#mapModal");
+  const ORIGIN = "Cantinho Doce Pousada e Camping Clube, Lumiar, Nova Friburgo - RJ";
+  const PLACES = {
+    lumiar:   { name: "Centro de Lumiar",   dest: "Lumiar, Nova Friburgo - RJ" },
+    saopedro: { name: "São Pedro da Serra", dest: "São Pedro da Serra, Nova Friburgo - RJ" },
+    mury:     { name: "Mury",               dest: "Mury, Nova Friburgo - RJ" },
+    ponte:    { name: "Ponte da Saudade",   dest: "Ponte da Saudade, Nova Friburgo - RJ" },
+  };
+  let mapReturnFocus = null;
+  function openMap(slug, returnFocus) {
+    const pl = PLACES[slug];
+    if (!pl || !mapModal) return;
+    mapReturnFocus = returnFocus;
+    $("#mapTitle").textContent = "Cantinho Doce → " + pl.name;
+    $("#mapSub").textContent = "Rota de carro saindo do Cantinho Doce até " + pl.name;
+    $("#mapFrame").src = "https://www.google.com/maps?saddr=" + encodeURIComponent(ORIGIN) + "&daddr=" + encodeURIComponent(pl.dest) + "&hl=pt-BR&output=embed";
+    $("#mapOpen").href = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(ORIGIN) + "&destination=" + encodeURIComponent(pl.dest) + "&travelmode=driving";
+    mapModal.classList.add("is-open");
+    mapModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+    $("#mapClose").focus();
+  }
+  function closeMap() {
+    mapModal.classList.remove("is-open");
+    mapModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll");
+    setTimeout(() => { $("#mapFrame").src = "about:blank"; }, 400);
+    if (mapReturnFocus && mapReturnFocus.focus) mapReturnFocus.focus();
+  }
+  if (mapModal) {
+    $(".modal__backdrop", mapModal).addEventListener("click", closeMap);
+    $("#mapClose").addEventListener("click", closeMap);
+    $("#mapCloseBtn").addEventListener("click", closeMap);
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-map]");
+      if (t) { e.preventDefault(); openMap(t.dataset.map, t); }
+    });
+  }
+
+  /* ---------- Faixa de depoimentos (duplica para loop contínuo) ---------- */
+  ["#rvTrack1", "#rvTrack2"].forEach((id) => {
+    const track = $(id);
+    if (!track) return;
+    const items = Array.from(track.children);
+    items.forEach((it) => { const c = it.cloneNode(true); c.setAttribute("aria-hidden", "true"); track.appendChild(c); });
+  });
+
   /* ---------- Teclado ---------- */
   document.addEventListener("keydown", (e) => {
     if (lb.classList.contains("is-open")) {
       if (e.key === "Escape") closeLightbox();
       else if (e.key === "ArrowRight") lbStep(1);
       else if (e.key === "ArrowLeft") lbStep(-1);
+      return;
+    }
+    if (mapModal && mapModal.classList.contains("is-open")) {
+      if (e.key === "Escape") closeMap();
       return;
     }
     if (modal.classList.contains("is-open")) {
