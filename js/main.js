@@ -35,8 +35,9 @@
   /* ---------- Hero slideshow ---------- */
   const slides = $$(".hero__slide");
   const dotsWrap = $("#heroDots");
+  const caption = $("#heroCaption");
+  const INTERVAL = 5500;
   let current = 0, timer = null;
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   slides.forEach((s, i) => {
     const b = document.createElement("button");
@@ -53,6 +54,10 @@
     current = (i + slides.length) % slides.length;
     slides[current].classList.add("is-active");
     dots[current].classList.add("is-active");
+    if (caption) {
+      caption.classList.add("is-fading");
+      setTimeout(() => { caption.textContent = slides[current].dataset.caption || ""; caption.classList.remove("is-fading"); }, 600);
+    }
     // pré-carrega a próxima
     const next = slides[(current + 1) % slides.length];
     if (next && !next.dataset.loaded) {
@@ -64,9 +69,10 @@
   }
   function restart() {
     clearInterval(timer);
-    if (!reduced && slides.length > 1) timer = setInterval(() => go(current + 1), 6500);
+    if (slides.length > 1) timer = setInterval(() => go(current + 1), INTERVAL);
   }
   slides.forEach((s, i) => { if (i === 0) { s.style.backgroundImage = "url('" + s.dataset.src + "')"; s.dataset.loaded = "1"; } });
+  if (caption && slides[0]) caption.textContent = slides[0].dataset.caption || "";
   go(0);
   restart();
   document.addEventListener("visibilitychange", () => { if (document.hidden) clearInterval(timer); else restart(); });
