@@ -39,6 +39,22 @@
   const caption = $("#heroCaption");
   const INTERVAL = 5500;
   let current = 0, timer = null, dots = [];
+  // em telas pequenas usa a versão de 900 px das fotos do carrossel
+  const SMALL = window.matchMedia("(max-width: 720px)").matches;
+  slides.forEach((s) => { if (SMALL && s.dataset.srcSm) s.dataset.src = s.dataset.srcSm; });
+
+  /* fundos carregados sob demanda (data-bg) */
+  const bgs = $$("[data-bg]");
+  if (bgs.length) {
+    const bgio = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.style.backgroundImage = "url('" + e.target.dataset.bg + "')";
+        bgio.unobserve(e.target);
+      });
+    }, { rootMargin: "600px 0px" });
+    bgs.forEach((el) => bgio.observe(el));
+  }
 
   function go(i) {
     slides[current].classList.remove("is-active");

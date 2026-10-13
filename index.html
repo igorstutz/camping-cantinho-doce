@@ -25,7 +25,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="img/lg/hero-serra.webp">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="preload" as="image" href="img/lg/hero-serra.webp" media="(min-width: 721px)">
+  <link rel="preload" as="image" href="img/sm/hero-serra.webp" media="(max-width: 720px)">
   <link rel="stylesheet" href="css/style.css">
 
   <script type="application/ld+json">
@@ -58,6 +60,22 @@
       { "@type": "LocationFeatureSpecification", "name": "Acesso ao rio", "value": true }
     ],
     "sameAs": ["https://instagram.com/campingcantinhodoce", "https://www.facebook.com/campingcantinhodoce"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Qual é o horário de check-in e check-out?", "acceptedAnswer": { "@type": "Answer", "text": "Na Pousada, check-in a partir das 12h (até 21h) e check-out até 13h para 1 diária ou até 15h para 2 ou mais diárias. Check-out estendido até 18h mediante disponibilidade, com taxa de R$ 40 por pessoa. No Camping Club, check-in das 10h às 21h e check-out até 15h do dia seguinte." } },
+      { "@type": "Question", "name": "Aceitam pets?", "acceptedAnswer": { "@type": "Answer", "text": "Sim, somos pet friendly. Aceitamos cão ou gato de pequeno porte, até 7 kg, sem taxa. Cão sempre na guia; gato na acomodação ou em caixa de transporte. A limpeza do que o animal faz é por conta do tutor. Informe ao reservar." } },
+      { "@type": "Question", "name": "Como funciona a reserva direta?", "acceptedAnswer": { "@type": "Answer", "text": "Na Pousada você reserva pelo sistema online, sem intermediários, com pagamento via PIX ou cartão e confirmação imediata por WhatsApp. Caução de 35% no momento da reserva, com direito a uma remarcação gratuita com 7 dias de antecedência. No Camping Club não há caução: o pagamento é feito no check-in." } },
+      { "@type": "Question", "name": "Crianças pagam?", "acceptedAnswer": { "@type": "Answer", "text": "Na Pousada, crianças até 5 anos pagam R$ 60 por diária. No Camping Club, crianças até 5 anos pagam R$ 35 por diária. Acima de 5 anos, valor de adulto nas duas operações." } },
+      { "@type": "Question", "name": "Aceitam motorhome ou trailer no camping? Tem energia?", "acceptedAnswer": { "@type": "Answer", "text": "Sim, aceitamos barraca, trailer e motorhome nas vagas públicas à beira do Rio Macaé. O camping conta com energia 220V, cozinha compartilhada, banheiros e churrasqueira nova à beira do rio." } },
+      { "@type": "Question", "name": "Posso receber visitas?", "acceptedAnswer": { "@type": "Answer", "text": "Não. A área é exclusiva para hóspedes hospedados: não recebemos visitantes nem trabalhamos com day use, em nenhuma hipótese." } },
+      { "@type": "Question", "name": "Tem cachoeira perto?", "acceptedAnswer": { "@type": "Answer", "text": "Lumiar é conhecida pelas cachoeiras e trilhas da Serra Fluminense, e ficamos a poucos minutos do centrinho, de onde saem os acessos. Dentro da propriedade você tem o Rio Macaé correndo à beira das acomodações." } },
+      { "@type": "Question", "name": "Tem internet e sinal de celular?", "acceptedAnswer": { "@type": "Answer", "text": "Temos Wi-Fi de fibra de 100 Mbps. Como estamos em área rural, um imprevisto pode acontecer. No celular, a Claro é a operadora com melhor sinal na região." } }
+    ]
   }
   </script>
 </head>
@@ -140,10 +158,10 @@
 <!-- ===== Hero ===== -->
 <section class="hero" id="inicio">
   <div class="hero__slides" aria-hidden="true">
-    <div class="hero__slide" data-src="img/lg/hero-serra.webp" data-caption="Chalezinhos e a Pedra Riscada"></div>
-    <div class="hero__slide" data-src="img/lg/hero-rio.webp" data-caption="Rio Macaé"></div>
-    <div class="hero__slide" data-src="img/lg/hero-trailer.webp" data-caption="Trailer Estrela e o lago"></div>
-    <div class="hero__slide" data-src="img/lg/chz-rede.webp" data-caption="Chalezinho A-frame"></div>
+    <div class="hero__slide" data-src="img/lg/hero-serra.webp" data-src-sm="img/sm/hero-serra.webp" data-caption="Chalezinhos e a Pedra Riscada"></div>
+    <div class="hero__slide" data-src="img/lg/hero-rio.webp" data-src-sm="img/sm/hero-rio.webp" data-caption="Rio Macaé"></div>
+    <div class="hero__slide" data-src="img/lg/hero-trailer.webp" data-src-sm="img/sm/hero-trailer.webp" data-caption="Trailer Estrela e o lago"></div>
+    <div class="hero__slide" data-src="img/lg/chz-rede.webp" data-src-sm="img/sm/chz-rede.webp" data-caption="Chalezinho A-frame"></div>
   </div>
   <div class="hero__overlay"></div>
 
@@ -191,7 +209,7 @@
   <div class="container about__grid">
     <div class="collage reveal">
       <svg class="collage__leaf" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-leaf"/></svg>
-      <img class="collage__main" src="img/lg/chz-rede.webp" alt="Chalezinho A-frame com rede, montanhas ao fundo" loading="lazy" width="1600" height="1068">
+      <img class="collage__main" src="img/sm/chz-rede.webp" srcset="img/sm/chz-rede.webp 900w, img/lg/chz-rede.webp 1600w" sizes="(max-width: 900px) 90vw, 520px" alt="Chalezinho A-frame com rede, montanhas ao fundo" loading="lazy" width="900" height="601">
       <img class="collage__b" src="img/sm/camp-barraca-rio.webp" alt="Barraca montada à beira do Rio Macaé" loading="lazy" width="405" height="900">
       <img class="collage__c" src="img/sm/tr-gansos.webp" alt="Gansos passeando no gramado" loading="lazy" width="900" height="601">
       <div class="collage__stamp" aria-hidden="true">
@@ -236,7 +254,7 @@
     </div>
     <div class="duo">
       <a class="duo__card reveal" href="#acomodacoes">
-        <img src="img/lg/chz-fachada.webp" alt="Chalezinho A-frame de madeira entre as árvores" loading="lazy" width="1068" height="1600">
+        <img src="img/sm/chz-fachada.webp" srcset="img/sm/chz-fachada.webp 600w, img/lg/chz-fachada.webp 1068w" sizes="(max-width: 860px) 100vw, 590px" alt="Chalezinho A-frame de madeira entre as árvores" loading="lazy" width="600" height="900">
         <div class="duo__body">
           <span class="duo__tag">Pousada</span>
           <h3>Chalés, suíte e trailer</h3>
@@ -246,7 +264,7 @@
         </div>
       </a>
       <a class="duo__card reveal" data-delay="1" href="#camping">
-        <img src="img/lg/camp-barraca-ipe.webp" alt="Barraca cinza montada sob um ipê, com o rio ao fundo" loading="lazy" width="720" height="1600">
+        <img src="img/sm/camp-barraca-ipe.webp" srcset="img/sm/camp-barraca-ipe.webp 405w, img/lg/camp-barraca-ipe.webp 720w" sizes="(max-width: 860px) 100vw, 590px" alt="Barraca cinza montada sob um ipê, com o rio ao fundo" loading="lazy" width="405" height="900">
         <div class="duo__body">
           <span class="duo__tag">Camping Club</span>
           <h3>Camping de verdade, à beira do rio</h3>
@@ -279,7 +297,7 @@
 
 <!-- ===== Camping Club ===== -->
 <section class="section camping" id="camping">
-  <div class="camping__bg" aria-hidden="true"></div>
+  <div class="camping__bg" data-bg="img/lg/camp-barraca-verde-rio.webp" aria-hidden="true"></div>
   <div class="container camping__grid">
     <div class="reveal">
       <span class="eyebrow" style="color:var(--gold-2)">Camping Club · Desde 2012</span>
@@ -548,7 +566,7 @@
 
     <div class="guide-hero">
       <a class="guide-cover reveal" href="guia.html">
-        <img src="img/lg/tr-rede.webp" alt="Rede na área coberta do Trailer Estrela" loading="lazy">
+        <img src="img/sm/tr-rede.webp" srcset="img/sm/tr-rede.webp 900w, img/lg/tr-rede.webp 1600w" sizes="(max-width: 900px) 100vw, 560px" alt="Rede na área coberta do Trailer Estrela" loading="lazy" width="900" height="601">
         <div class="guide-cover__body">
           <span class="guide-cover__tag">Guia completo · 10 capítulos</span>
           <h3>Respire fundo. <em>Você chegou.</em></h3>
@@ -628,6 +646,15 @@
         <div class="btn-row">
           <a class="btn btn--gold" href="https://maps.app.goo.gl/2iNcxQPpmdWiQRBD8" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg> Abrir no Google Maps</a>
           <a class="btn btn--ghost" href="guia.html">Guia do hóspede</a>
+        </div>
+        <div class="routes">
+          <small>Veja a rota saindo da sua cidade</small>
+          <div class="btn-row">
+            <button type="button" class="btn btn--ghost btn--sm" data-dest="Cantinho Doce" data-from="Rio de Janeiro, RJ" data-name="Rio de Janeiro"><svg aria-hidden="true"><use href="#i-car"/></svg> do Rio</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-dest="Cantinho Doce" data-from="Niterói, RJ" data-name="Niterói"><svg aria-hidden="true"><use href="#i-car"/></svg> de Niterói</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-dest="Cantinho Doce" data-from="Nova Friburgo, RJ" data-name="Nova Friburgo"><svg aria-hidden="true"><use href="#i-car"/></svg> de Friburgo</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-dest="Cantinho Doce" data-from="Macaé, RJ" data-name="Macaé"><svg aria-hidden="true"><use href="#i-car"/></svg> de Macaé</button>
+          </div>
         </div>
       </div>
       <div class="map reveal" data-delay="1">

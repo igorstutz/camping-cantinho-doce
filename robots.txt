@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://igorstutz.github.io/camping-cantinho-doce/sitemap.xml
